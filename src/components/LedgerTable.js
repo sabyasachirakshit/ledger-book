@@ -175,7 +175,7 @@ const handleFormSubmit = (values) => {
         }
     }
     setVisible(false);
-    location.reload();
+    window.location.reload();
 };
   return (
     <div className="ledger-book-screen" style={{display:"flex",flexDirection:"column",gap:"20px"}}>
