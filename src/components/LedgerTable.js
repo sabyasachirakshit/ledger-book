@@ -181,12 +181,12 @@ const handleFormSubmit = (values) => {
     <div className="ledger-book-screen" style={{display:"flex",flexDirection:"column",gap:"20px"}}>
         <h1 className="total-balance-screen" style={{display:"flex",justifyContent:"center"}}>Total Balance: {remaining_bank_balance+remaining_cash_in_hand_balance}</h1>
         <TransactionForm visible={visible} handleFormSubmit={handleFormSubmit} />
-        <div className='ledger-tables-screen' style={{display:"flex",gap:"20px"}}>
-        <div className="table-1" style={{width:"50%",display:"flex",flexDirection:"column",gap:"20px"}}>
-            <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Bank Balance: {remaining_bank_balance}</h2>
-            <div className="transaction-button" style={{display:"flex",width:"100%",justifyContent:"center"}}>
+        <div className="transaction-button" style={{display:"flex",width:"100%",justifyContent:"center"}}>
                 <Button type="primary" onClick={showForm}>Add Transaction</Button>
             </div>
+        <div className='ledger-tables-screen' style={{display:"flex",gap:"20px"}}>
+        <div className="table-1" style={{width:"50%",display:"flex",flexDirection:"column",gap:"20px"}}>
+            <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Bank Balance: {remaining_bank_balance}</h2>           
             <Table
                 columns={columns}
                 dataSource={[...onlineArray].reverse()}
@@ -199,9 +199,6 @@ const handleFormSubmit = (values) => {
         </div>
         <div className="table-2" style={{width:"50%",display:"flex",flexDirection:"column",gap:"20px"}}>
             <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Cash in Hand: {remaining_cash_in_hand_balance}</h2>
-            <div className="transaction-button" style={{display:"flex",width:"100%",justifyContent:"center"}}>
-                <Button type="primary" onClick={showForm}>Add Transaction</Button>
-            </div>
             <Table
                 columns={columns}
                 dataSource={[...offlineArray].reverse()}
