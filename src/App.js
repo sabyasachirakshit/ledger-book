@@ -1,4 +1,5 @@
 import LedgerTable from './components/LedgerTable';
+import "./App.css";
 
 function App() {
   return (
