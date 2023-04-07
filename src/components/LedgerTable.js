@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-import { Table } from 'antd';
+import { Table,Button } from 'antd';
 import { Modal, Form,DatePicker,Input,InputNumber,Radio } from 'antd';
 
 const columns = [
@@ -111,7 +111,7 @@ const offline_transaction_data = [
   ];
 
   const pagination = {
-    pageSize: 5, // Show 20 rows per page
+    pageSize: 20, // Show 20 rows per page
     position: ['bottomCenter'],
   };
 
@@ -158,14 +158,13 @@ const handleFormSubmit = (values) => {
   return (
     <div className="ledger-book-screen" style={{display:"flex",flexDirection:"column",gap:"20px"}}>
         <h1 className="total-balance-screen" style={{display:"flex",justifyContent:"center"}}>Total Balance: 58823.20</h1>
-        <div className="buttons-d-c" style={{display:"flex",gap:"20px",justifyContent:"center"}}>
-            <button type="button" className="btn btn-outline-danger" onClick={showForm}> - Debit</button>
-            <button type="button" className="btn btn-outline-success" onClick={showForm}> + Credit</button>
-        </div>
         <TransactionForm visible={visible} handleFormSubmit={handleFormSubmit} />
         <div className='ledger-tables-screen' style={{display:"flex",gap:"20px"}}>
         <div className="table-1" style={{width:"50%",display:"flex",flexDirection:"column",gap:"20px"}}>
             <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Bank Balance: 4234.12</h2>
+            <div className="transaction-button" style={{display:"flex",width:"100%",justifyContent:"center"}}>
+                <Button type="primary" onClick={showForm}>Add Transaction</Button>
+            </div>
             <Table
                 columns={columns}
                 dataSource={online_transaction_data}
@@ -178,6 +177,9 @@ const handleFormSubmit = (values) => {
         </div>
         <div className="table-2" style={{width:"50%",display:"flex",flexDirection:"column",gap:"20px"}}>
             <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Cash in Hand: 4234.12</h2>
+            <div className="transaction-button" style={{display:"flex",width:"100%",justifyContent:"center"}}>
+                <Button type="primary" onClick={showForm}>Add Transaction</Button>
+            </div>
             <Table
                 columns={columns}
                 dataSource={offline_transaction_data}
