@@ -1,5 +1,6 @@
 import React,{useState,useEffect} from 'react';
 import { Table,Button } from 'antd';
+import moment from 'moment';
 import { Modal, Form,DatePicker,Input,InputNumber,Radio } from 'antd';
 
 const columns = [
@@ -30,100 +31,46 @@ const columns = [
   },
 ];
 
-// const online_transaction_data = [
-//   {
-//     key: '1',
-//     dateTime: '2022-01-01 12:00:00',
-//     description: 'Example transaction',
-//     debits: 1000,
-//     credits: 0,
-//     balance: 1000,
-//   },
-//   {
-//     key: '2',
-//     dateTime: '2022-01-02 12:00:00',
-//     description: 'Another transaction',
-//     debits: 0,
-//     credits: 500,
-//     balance: 500,
-//   },
-//   // Add more transactions as needed
-// ];
-
-// const offline_transaction_data = [
-//     {
-//       key: '1',
-//       dateTime: '2022-01-01 12:00:00',
-//       description: 'Example transaction',
-//       debits: 1000,
-//       credits: 0,
-//       balance: 1000,
-//     },
-//     {
-//       key: '2',
-//       dateTime: '2022-01-02 12:00:00',
-//       description: 'Another transaction',
-//       debits: 0,
-//       credits: 100,
-//       balance: 500,
-//     },
-//     {
-//       key: '3',
-//       dateTime: '2022-01-02 12:00:00',
-//       description: 'Another transaction',
-//       debits: 0,
-//       credits: 100,
-//       balance: 500,
-//     },
-//     {
-//       key: '4',
-//       dateTime: '2022-01-02 12:00:00',
-//       description: 'Another transaction',
-//       debits: 0,
-//       credits: 100,
-//       balance: 500,
-//     },
-//     {
-//         key: '5',
-//         dateTime: '2022-01-02 12:00:00',
-//         description: 'Another transaction',
-//         debits: 0,
-//         credits: 100,
-//         balance: 500,
-//       },
-//       {
-//       key: '6',
-//       dateTime: '2022-01-02 12:00:00',
-//       description: 'Another transaction',
-//       debits: 0,
-//       credits: 100,
-//       balance: 500,
-//     },
-//     {
-//         key: '7',
-//         dateTime: '2022-01-02 12:00:00',
-//         description: 'Another transaction',
-//         debits: 0,
-//         credits: 100,
-//         balance: 500,
-//       },
-//     // Add more transactions as needed
-//   ];
-
   const pagination = {
     pageSize: 20, // Show 20 rows per page
     position: ['bottomCenter'],
   };
 
-  let offline_array=[];
-  let online_array=[];
-  let total_online_balance=0;
-  let total_offline_balance=0;
-  let online_key=1;
-  let offline_key=1;
-
 const LedgerTable = () => {
-    const [visible, setVisible] = useState(false);
+  let [visible, setVisible] = useState(false);
+  let [onlineArray, setOnlineArray] = useState([]);
+  let [offlineArray, setOfflineArray] = useState([]);
+  let [total_online_balance, setTotalOnlineBalance] = useState(0);
+  let [total_offline_balance, setTotalOfflineBalance] = useState(0);
+  let [onlineKey, setOnlineKey] = useState(1);
+  let [offlineKey, setOfflineKey] = useState(1);
+
+  useEffect(() => {
+    let balance = 0;
+    onlineArray.forEach((transaction) => {
+      if (transaction.credits > 0) {
+        balance += transaction.credits;
+      } else {
+        balance -= transaction.debits;
+      }
+      transaction.balance = balance;
+    });
+    setTotalOnlineBalance(balance);
+  }, [onlineArray]);
+
+  useEffect(() => {
+    let balance = 0;
+    offlineArray.forEach((transaction) => {
+      if (transaction.credits > 0) {
+        balance += transaction.credits;
+      } else {
+        balance -= transaction.debits;
+      }
+      transaction.balance = balance;
+    });
+    setTotalOfflineBalance(balance);
+  }, [offlineArray]);
+
     const TransactionForm = () => {
         const [form] = Form.useForm();
 
@@ -168,54 +115,55 @@ const handleFormSubmit = (values) => {
     if(values.m_type==="online"){
         if(values.t_type==="debit"){
             let online_transaction = {
-                key:online_key,
-                date: values.dateTime,
+                key:onlineKey,
+                date: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
                 description: values.description,
                 debits: values.amount,
                 credits:0,
                 balance:total_online_balance-values.amount
               };
-              online_key++;
-              online_array.push(online_transaction);
-              console.log("Online Array:",online_array);
+              setOnlineKey(onlineKey++);
+              setOnlineArray(onlineArray.push(online_transaction));
+              console.log("Online Array:",onlineArray);
+              console.log(online_transaction.date);
         }else if(values.t_type==="credit"){
             let online_transaction = {
-                key:online_key,
-                date: values.dateTime,
+                key:onlineKey,
+                date: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
                 description: values.description,
                 debits: 0,
                 credits:values.amount,
                 balance:total_online_balance+values.amount
               };
-              online_key++;
-              online_array.push(online_transaction);
-              console.log("Online Array:",online_array);
+              onlineKey++;
+              setOnlineArray(onlineArray.push(online_transaction));
+              console.log("Online Array:",onlineArray);
         }
     }else if(values.m_type==="offline"){
         if(values.t_type==="debit"){
             let offline_transaction = {
-                key:offline_key,
-                date: values.dateTime,
+                key:offlineKey,
+                date: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
                 description: values.description,
                 debits: values.amount,
                 credits:0,
                 balance:total_offline_balance-values.amount
               };
-              offline_key++;
-              offline_array.push(offline_transaction);
-              console.log("Offline Array:",offline_array);
+              setOfflineKey(offlineKey++);
+              setOfflineArray(offlineArray.push(offline_transaction));
+              console.log("Offline Array:",offlineArray);
         }else if(values.t_type==="credit"){
             let offline_transaction = {
-                key:offline_key,
-                date: values.dateTime,
+                key:offlineKey,
+                date: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
                 description: values.description,
                 debits: 0,
                 credits:values.amount,
                 balance:total_offline_balance+values.amount
               };
-              offline_key++;
-              offline_array.push(offline_transaction);
-              console.log("Offline Array:",offline_array);
+              offlineKey++;
+              setOfflineArray(offlineArray.push(offline_transaction));
+              console.log("Offline Array:",offlineArray);
         }
     }
     setVisible(false);
@@ -232,7 +180,7 @@ const handleFormSubmit = (values) => {
             </div>
             <Table
                 columns={columns}
-                dataSource={online_array}
+                dataSource={onlineArray}
                 bordered
                 title={() => (
                 <h2 style={{ textAlign: 'center' }}>Bank Account Transactions</h2>
@@ -247,7 +195,7 @@ const handleFormSubmit = (values) => {
             </div>
             <Table
                 columns={columns}
-                dataSource={offline_array}
+                dataSource={offlineArray}
                 bordered
                 title={() => (
                 <h2 style={{ textAlign: 'center' }}>Cash In Hand Transactions</h2>
