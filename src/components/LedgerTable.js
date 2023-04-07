@@ -40,40 +40,33 @@ const LedgerTable = () => {
   let [visible, setVisible] = useState(false);
   let [onlineArray, setOnlineArray] = useState([]);
   let [offlineArray, setOfflineArray] = useState([]);
-  let [total_online_balance, setTotalOnlineBalance] = useState(0);
-  let [total_offline_balance, setTotalOfflineBalance] = useState(0);
   let [onlineKey, setOnlineKey] = useState(1);
   let [offlineKey, setOfflineKey] = useState(1);
+  let [remaining_bank_balance,setRemainingBankBalance]=useState(0);
+  let [remaining_cash_in_hand_balance,setRemainingCashInHandBalance]=useState(0);
 
   useEffect(() => {
-    let balance = 0;
-    onlineArray.forEach((transaction) => {
-      if (transaction.credits > 0) {
-        balance += transaction.credits;
-      } else {
-        balance -= transaction.debits;
+    const storedOnlineArray= JSON.parse(localStorage.getItem('onlineArray'));
+    storedOnlineArray?setOnlineArray(storedOnlineArray):setOnlineArray([]);
+    if(storedOnlineArray){
+      if(storedOnlineArray.length>=1){
+        setRemainingBankBalance(storedOnlineArray[storedOnlineArray.length-1].balance);
       }
-      transaction.balance = balance;
-    });
-    setTotalOnlineBalance(balance);
-  }, [onlineArray]);
-
-  useEffect(() => {
-    let balance = 0;
-    offlineArray.forEach((transaction) => {
-      if (transaction.credits > 0) {
-        balance += transaction.credits;
-      } else {
-        balance -= transaction.debits;
+    }
+    
+     const storedOfflineArray= JSON.parse(localStorage.getItem('offlineArray'));
+     
+      storedOfflineArray?setOfflineArray(storedOfflineArray):setOfflineArray([]);
+      if(storedOfflineArray){
+      if(storedOfflineArray.length>=1){
+        setRemainingCashInHandBalance(storedOfflineArray[storedOfflineArray.length-1].balance);
       }
-      transaction.balance = balance;
-    });
-    setTotalOfflineBalance(balance);
-  }, [offlineArray]);
+     }
+    
+  }, []);
 
     const TransactionForm = () => {
         const [form] = Form.useForm();
-
         return (
             <Modal
             open={visible}
@@ -111,76 +104,92 @@ const LedgerTable = () => {
 };
 
 const handleFormSubmit = (values) => {
-    // console.log('Form submitted:', values);
     if(values.m_type==="online"){
         if(values.t_type==="debit"){
+          let total_balance=0;
+          if(onlineArray.length>=1){
+           total_balance = onlineArray[onlineArray.length-1].balance;
+          }
             let online_transaction = {
                 key:onlineKey,
-                date: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
+                dateTime: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
                 description: values.description,
                 debits: values.amount,
                 credits:0,
-                balance:total_online_balance-values.amount
+                balance:total_balance-values.amount
               };
               setOnlineKey(onlineKey++);
-              setOnlineArray(onlineArray.push(online_transaction));
+              onlineArray.push(online_transaction);
+              localStorage.setItem('onlineArray', JSON.stringify(onlineArray));
               console.log("Online Array:",onlineArray);
-              console.log(online_transaction.date);
         }else if(values.t_type==="credit"){
+          let total_balance=0;
+          if(onlineArray.length>=1){
+           total_balance = onlineArray[onlineArray.length-1].balance;
+          }
             let online_transaction = {
                 key:onlineKey,
-                date: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
+                dateTime: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
                 description: values.description,
                 debits: 0,
                 credits:values.amount,
-                balance:total_online_balance+values.amount
+                balance:total_balance+values.amount
               };
               onlineKey++;
-              setOnlineArray(onlineArray.push(online_transaction));
-              console.log("Online Array:",onlineArray);
+              onlineArray.push(online_transaction);
+              localStorage.setItem('onlineArray', JSON.stringify(onlineArray));
         }
     }else if(values.m_type==="offline"){
         if(values.t_type==="debit"){
+          let total_balance=0;
+          if(offlineArray.length>=1){
+           total_balance = offlineArray[offlineArray.length-1].balance;
+          }
             let offline_transaction = {
                 key:offlineKey,
-                date: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
+                dateTime: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
                 description: values.description,
                 debits: values.amount,
                 credits:0,
-                balance:total_offline_balance-values.amount
+                balance:total_balance-values.amount
               };
               setOfflineKey(offlineKey++);
-              setOfflineArray(offlineArray.push(offline_transaction));
-              console.log("Offline Array:",offlineArray);
+              offlineArray.push(offline_transaction);
+              localStorage.setItem('offlineArray', JSON.stringify(offlineArray));
         }else if(values.t_type==="credit"){
+          let total_balance=0;
+          if(offlineArray.length>=1){
+           total_balance = offlineArray[offlineArray.length-1].balance;
+          }
             let offline_transaction = {
                 key:offlineKey,
-                date: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
+                dateTime: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
                 description: values.description,
                 debits: 0,
                 credits:values.amount,
-                balance:total_offline_balance+values.amount
+                balance:total_balance+values.amount
               };
               offlineKey++;
-              setOfflineArray(offlineArray.push(offline_transaction));
-              console.log("Offline Array:",offlineArray);
+              offlineArray.push(offline_transaction);
+              localStorage.setItem('offlineArray', JSON.stringify(offlineArray));
         }
     }
     setVisible(false);
+    windows.location.reload();
 };
   return (
     <div className="ledger-book-screen" style={{display:"flex",flexDirection:"column",gap:"20px"}}>
-        <h1 className="total-balance-screen" style={{display:"flex",justifyContent:"center"}}>Total Balance: 58823.20</h1>
+        <h1 className="total-balance-screen" style={{display:"flex",justifyContent:"center"}}>Total Balance: {remaining_bank_balance+remaining_cash_in_hand_balance}</h1>
         <TransactionForm visible={visible} handleFormSubmit={handleFormSubmit} />
         <div className='ledger-tables-screen' style={{display:"flex",gap:"20px"}}>
         <div className="table-1" style={{width:"50%",display:"flex",flexDirection:"column",gap:"20px"}}>
-            <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Bank Balance: 4234.12</h2>
+            <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Bank Balance: {remaining_bank_balance}</h2>
             <div className="transaction-button" style={{display:"flex",width:"100%",justifyContent:"center"}}>
                 <Button type="primary" onClick={showForm}>Add Transaction</Button>
             </div>
             <Table
                 columns={columns}
-                dataSource={onlineArray}
+                dataSource={[...onlineArray].reverse()}
                 bordered
                 title={() => (
                 <h2 style={{ textAlign: 'center' }}>Bank Account Transactions</h2>
@@ -189,13 +198,13 @@ const handleFormSubmit = (values) => {
             />
         </div>
         <div className="table-2" style={{width:"50%",display:"flex",flexDirection:"column",gap:"20px"}}>
-            <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Cash in Hand: 4234.12</h2>
+            <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Cash in Hand: {remaining_cash_in_hand_balance}</h2>
             <div className="transaction-button" style={{display:"flex",width:"100%",justifyContent:"center"}}>
                 <Button type="primary" onClick={showForm}>Add Transaction</Button>
             </div>
             <Table
                 columns={columns}
-                dataSource={offlineArray}
+                dataSource={[...offlineArray].reverse()}
                 bordered
                 title={() => (
                 <h2 style={{ textAlign: 'center' }}>Cash In Hand Transactions</h2>
