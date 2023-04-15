@@ -1,7 +1,7 @@
 import React,{useState,useEffect} from 'react';
 import { Table,Button } from 'antd';
-import moment from 'moment';
-import { Modal, Form,DatePicker,Input,InputNumber,Radio } from 'antd';
+import moment from 'moment-timezone';
+import { Modal, Form,DatePicker,TimePicker,Input,InputNumber,Radio } from 'antd';
 
 const columns = [
   {
@@ -68,35 +68,34 @@ const LedgerTable = () => {
     const TransactionForm = () => {
         const [form] = Form.useForm();
         return (
-            <Modal
-            open={visible}
-            onCancel={() => setVisible(false)}
-            onOk={() => form.submit()}
-            >
+           <Modal open={visible} onCancel={() => setVisible(false)} onOk={() => form.submit()}>
             <Form form={form} onFinish={handleFormSubmit}>
-                <Form.Item name="dateTime" label="Transaction Date and Time">
-                <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" />
-                </Form.Item>
-                <Form.Item name="description" label="Transaction Description">
+              <Form.Item name="date" label="Transaction Date" rules={[{ required: true }]}>
+                <DatePicker format="YYYY-MM-DD" />
+              </Form.Item>
+              <Form.Item name="time" label="Transaction Time" rules={[{ required: true }]}>
+                <TimePicker format="HH:mm:ss" />
+              </Form.Item>
+              <Form.Item name="description" label="Transaction Description" rules={[{ required: true }]}>
                 <Input />
-                </Form.Item>
-                <Form.Item name="amount" label="Transaction Amount">
+              </Form.Item>
+              <Form.Item name="amount" label="Transaction Amount" rules={[{ required: true }]}>
                 <InputNumber />
-                </Form.Item>
-                <Form.Item name="t_type" label="Transaction Type">
+              </Form.Item>
+              <Form.Item name="t_type" label="Transaction Type" rules={[{ required: true }]}>
                 <Radio.Group>
-                    <Radio value="debit">Debit</Radio>
-                    <Radio value="credit">Credit</Radio>
+                  <Radio value="debit">Debit</Radio>
+                  <Radio value="credit">Credit</Radio>
                 </Radio.Group>
-                </Form.Item>
-                <Form.Item name="m_type" label="Transaction Mode">
+              </Form.Item>
+              <Form.Item name="m_type" label="Transaction Mode" rules={[{ required: true }]}>
                 <Radio.Group>
-                    <Radio value="online">Online Bank Transaction</Radio>
-                    <Radio value="offline">Offline Cash Transaction</Radio>
+                  <Radio value="online">Online Bank Transaction</Radio>
+                  <Radio value="offline">Offline Cash Transaction</Radio>
                 </Radio.Group>
-                </Form.Item>
-                </Form>
-            </Modal>
+              </Form.Item>
+            </Form>
+        </Modal>
             );
         };
         const showForm = () => {
@@ -104,6 +103,9 @@ const LedgerTable = () => {
 };
 
 const handleFormSubmit = (values) => {
+  const date = moment(values.date).format("YYYY-MM-DD");
+  const time = values.time.format("HH:mm:ss");
+  const dateTime = moment(`${date} ${time}`).tz(moment.tz.guess()).format("YYYY-MM-DD HH:mm:ss");
     if(values.m_type==="online"){
         if(values.t_type==="debit"){
           let total_balance=0;
@@ -112,7 +114,7 @@ const handleFormSubmit = (values) => {
           }
             let online_transaction = {
                 key:onlineKey,
-                dateTime: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
+                dateTime: dateTime,
                 description: values.description,
                 debits: values.amount,
                 credits:0,
@@ -121,7 +123,6 @@ const handleFormSubmit = (values) => {
               setOnlineKey(onlineKey++);
               onlineArray.push(online_transaction);
               localStorage.setItem('onlineArray', JSON.stringify(onlineArray));
-              console.log("Online Array:",onlineArray);
         }else if(values.t_type==="credit"){
           let total_balance=0;
           if(onlineArray.length>=1){
@@ -129,7 +130,7 @@ const handleFormSubmit = (values) => {
           }
             let online_transaction = {
                 key:onlineKey,
-                dateTime: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
+                dateTime: dateTime,
                 description: values.description,
                 debits: 0,
                 credits:values.amount,
@@ -147,7 +148,7 @@ const handleFormSubmit = (values) => {
           }
             let offline_transaction = {
                 key:offlineKey,
-                dateTime: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
+                dateTime: dateTime,
                 description: values.description,
                 debits: values.amount,
                 credits:0,
@@ -163,7 +164,7 @@ const handleFormSubmit = (values) => {
           }
             let offline_transaction = {
                 key:offlineKey,
-                dateTime: moment(values.dateTime).format('YYYY-MM-DD HH:mm:ss'),
+                dateTime: dateTime,
                 description: values.description,
                 debits: 0,
                 credits:values.amount,
@@ -175,7 +176,7 @@ const handleFormSubmit = (values) => {
         }
     }
     setVisible(false);
-    location.reload();
+    window.location.reload();
 };
   return (
     <div className="ledger-book-screen" style={{display:"flex",flexDirection:"column",gap:"20px"}}>
