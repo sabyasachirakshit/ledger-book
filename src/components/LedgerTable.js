@@ -32,7 +32,7 @@ const columns = [
 ];
 
   const pagination = {
-    pageSize: 20, // Show 20 rows per page
+    pageSize: 20,
     position: ['bottomCenter'],
   };
 
@@ -46,23 +46,25 @@ const LedgerTable = () => {
   let [remaining_cash_in_hand_balance,setRemainingCashInHandBalance]=useState(0);
 
   useEffect(() => {
-    const storedOnlineArray= JSON.parse(localStorage.getItem('onlineArray'));
-    storedOnlineArray?setOnlineArray(storedOnlineArray):setOnlineArray([]);
-    if(storedOnlineArray){
-      if(storedOnlineArray.length>=1){
-        setRemainingBankBalance(storedOnlineArray[storedOnlineArray.length-1].balance);
+    fetch('http://localhost:4000/serverdata')
+    .then(response => response.json())
+    .then(data => {
+      const offlineArray = data.offline_array;
+      const onlineArray = data.online_array;
+      onlineArray?setOnlineArray(onlineArray):setOnlineArray([]);
+      if(onlineArray){
+        if(onlineArray.length>=1){
+          setRemainingBankBalance(onlineArray[onlineArray.length-1].balance);
+        }
       }
-    }
-    
-     const storedOfflineArray= JSON.parse(localStorage.getItem('offlineArray'));
-     
-      storedOfflineArray?setOfflineArray(storedOfflineArray):setOfflineArray([]);
-      if(storedOfflineArray){
-      if(storedOfflineArray.length>=1){
-        setRemainingCashInHandBalance(storedOfflineArray[storedOfflineArray.length-1].balance);
+      offlineArray?setOfflineArray(offlineArray):setOfflineArray([]);
+      if(offlineArray){
+      if(offlineArray.length>=1){
+        setRemainingCashInHandBalance(offlineArray[offlineArray.length-1].balance);
       }
-     }
-    
+      }
+    })
+    .catch(error => console.error(error));
   }, []);
 
     const TransactionForm = () => {
@@ -102,7 +104,8 @@ const LedgerTable = () => {
             setVisible(true);
 };
 
-const handleFormSubmit = (values) => {
+
+const handleFormSubmit = async(values) => {
   const date = moment(values.date).format("YYYY-MM-DD");
   const time = values.time.format("HH:mm:ss");
   const dateTime = moment(`${date} ${time}`).tz(moment.tz.guess()).format("YYYY-MM-DD HH:mm:ss");
@@ -121,8 +124,16 @@ const handleFormSubmit = (values) => {
                 balance:total_balance-values.amount
               };
               setOnlineKey(onlineKey++);
-              onlineArray.push(online_transaction);
-              localStorage.setItem('onlineArray', JSON.stringify(onlineArray));
+              
+              const response = await fetch('http://localhost:4000/write-online-array', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(online_transaction)
+              });
+              const json = await response.json();
+              console.log(json);
         }else if(values.t_type==="credit"){
           let total_balance=0;
           if(onlineArray.length>=1){
@@ -137,8 +148,16 @@ const handleFormSubmit = (values) => {
                 balance:total_balance+values.amount
               };
               onlineKey++;
-              onlineArray.push(online_transaction);
-              localStorage.setItem('onlineArray', JSON.stringify(onlineArray));
+              
+              const response = await fetch('http://localhost:4000/write-online-array', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(online_transaction)
+              });
+              const json = await response.json();
+              console.log(json);
         }
     }else if(values.m_type==="offline"){
         if(values.t_type==="debit"){
@@ -155,8 +174,15 @@ const handleFormSubmit = (values) => {
                 balance:total_balance-values.amount
               };
               setOfflineKey(offlineKey++);
-              offlineArray.push(offline_transaction);
-              localStorage.setItem('offlineArray', JSON.stringify(offlineArray));
+              const response = await fetch('http://localhost:4000/write-offline-array', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(offline_transaction)
+              });
+              const json = await response.json();
+              console.log(json);
         }else if(values.t_type==="credit"){
           let total_balance=0;
           if(offlineArray.length>=1){
@@ -171,8 +197,15 @@ const handleFormSubmit = (values) => {
                 balance:total_balance+values.amount
               };
               offlineKey++;
-              offlineArray.push(offline_transaction);
-              localStorage.setItem('offlineArray', JSON.stringify(offlineArray));
+              const response = await fetch('http://localhost:4000/write-offline-array', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(offline_transaction)
+              });
+              const json = await response.json();
+              console.log(json);
         }
     }
     setVisible(false);
