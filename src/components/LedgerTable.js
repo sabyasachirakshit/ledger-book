@@ -51,25 +51,22 @@ const LedgerTable = () => {
     .then(data => {
       const offlineArray = data.offline_array;
       const onlineArray = data.online_array;
-      console.log(offlineArray, onlineArray);
+      onlineArray?setOnlineArray(onlineArray):setOnlineArray([]);
+      if(onlineArray){
+        if(onlineArray.length>=1){
+          setRemainingBankBalance(onlineArray[onlineArray.length-1].balance);
+        }
+      }
+      offlineArray?setOfflineArray(offlineArray):setOfflineArray([]);
+      if(offlineArray){
+      if(offlineArray.length>=1){
+        setRemainingCashInHandBalance(offlineArray[offlineArray.length-1].balance);
+      }
+      }
+      console.log("This is Online Array:",onlineArray);
+      console.log("This is Offline Array:",offlineArray);
     })
     .catch(error => console.error(error));
-    const storedOnlineArray= JSON.parse(localStorage.getItem('onlineArray'));
-    storedOnlineArray?setOnlineArray(storedOnlineArray):setOnlineArray([]);
-    if(storedOnlineArray){
-      if(storedOnlineArray.length>=1){
-        setRemainingBankBalance(storedOnlineArray[storedOnlineArray.length-1].balance);
-      }
-    }
-    
-     const storedOfflineArray= JSON.parse(localStorage.getItem('offlineArray'));
-     
-      storedOfflineArray?setOfflineArray(storedOfflineArray):setOfflineArray([]);
-      if(storedOfflineArray){
-      if(storedOfflineArray.length>=1){
-        setRemainingCashInHandBalance(storedOfflineArray[storedOfflineArray.length-1].balance);
-      }
-     }
     
   }, []);
 
