@@ -32,7 +32,7 @@ const columns = [
 ];
 
   const pagination = {
-    pageSize: 20, // Show 20 rows per page
+    pageSize: 20,
     position: ['bottomCenter'],
   };
 
@@ -46,6 +46,14 @@ const LedgerTable = () => {
   let [remaining_cash_in_hand_balance,setRemainingCashInHandBalance]=useState(0);
 
   useEffect(() => {
+    fetch('http://localhost:4000/serverdata')
+    .then(response => response.json())
+    .then(data => {
+      const offlineArray = data.offline_array;
+      const onlineArray = data.online_array;
+      console.log(offlineArray, onlineArray);
+    })
+    .catch(error => console.error(error));
     const storedOnlineArray= JSON.parse(localStorage.getItem('onlineArray'));
     storedOnlineArray?setOnlineArray(storedOnlineArray):setOnlineArray([]);
     if(storedOnlineArray){
