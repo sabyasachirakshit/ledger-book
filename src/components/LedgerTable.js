@@ -8,6 +8,7 @@ const columns = [
     title: 'Date and Time',
     dataIndex: 'dateTime',
     key: 'dateTime',
+    render: text => <strong>{text}</strong>,
   },
   {
     title: 'Description',
@@ -18,16 +19,19 @@ const columns = [
     title: 'Debits',
     dataIndex: 'debits',
     key: 'debits',
+    render: text => <span style={{ color: 'red' }}>- {text}</span>,
   },
   {
     title: 'Credits',
     dataIndex: 'credits',
     key: 'credits',
+    render: text => <span style={{ color: 'green' }}>+ {text}</span>,
   },
   {
     title: 'Balance',
     dataIndex: 'balance',
     key: 'balance',
+    render: text => <span style={{ color: 'blue' }}>{text}</span>,
   },
 ];
 
@@ -212,38 +216,41 @@ const handleFormSubmit = async(values) => {
     window.location.reload();
 };
   return (
-    <div className="ledger-book-screen" style={{display:"flex",flexDirection:"column",gap:"20px"}}>
+    <div className="ledger-book-screen" style={{display:"flex",flexDirection:"column"}}>
         <h1 className="total-balance-screen" style={{display:"flex",justifyContent:"center"}}>Total Balance: {remaining_bank_balance+remaining_cash_in_hand_balance}</h1>
         <TransactionForm visible={visible} handleFormSubmit={handleFormSubmit} />
-        <div className="transaction-button" style={{display:"flex",width:"100%",justifyContent:"center"}}>
+        <div className="transaction-button" style={{marginBottom:"10px",display:"flex",width:"100%",justifyContent:"center"}}>
                 <Button type="primary" onClick={showForm}>Add Transaction</Button>
-            </div>
+        </div>
+        <div className="barrier-hz" style={{backgroundColor:"black",width:"100%",height:"1vh"}}></div>
         <div className='ledger-tables-screen' style={{display:"flex",gap:"20px"}}>
-        <div className="table-1" style={{width:"50%",display:"flex",flexDirection:"column",gap:"20px"}}>
-            <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Bank Balance: {remaining_bank_balance}</h2>           
-            <Table
-                columns={columns}
-                dataSource={[...onlineArray].reverse()}
-                bordered
-                title={() => (
-                <h2 style={{ textAlign: 'center' }}>Bank Account Transactions</h2>
-                )}
-                pagination={pagination}
-            />
+          <div className="table-1" style={{marginTop:"1%",width:"50%",display:"flex",flexDirection:"column",gap:"20px"}}>
+              <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Bank Balance: {remaining_bank_balance}</h2>           
+              <Table
+                  columns={columns}
+                  dataSource={[...onlineArray].reverse()}
+                  bordered
+                  title={() => (
+                  <h2 style={{ textAlign: 'center' }}>Bank Account Transactions</h2>
+                  )}
+                  pagination={pagination}
+              />
+          </div>
+          <div className="barrier-vt" style={{backgroundColor:"black",width:"0.5%"}}></div>
+          <div className="table-2" style={{marginTop:"1%",width:"50%",display:"flex",flexDirection:"column",gap:"20px"}}>
+              <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Cash in Hand: {remaining_cash_in_hand_balance}</h2>
+              <Table
+                  columns={columns}
+                  dataSource={[...offlineArray].reverse()}
+                  bordered
+                  title={() => (
+                  <h2 style={{ textAlign: 'center' }}>Cash In Hand Transactions</h2>
+                  )}
+                  pagination={pagination}
+              />
+          </div>
         </div>
-        <div className="table-2" style={{width:"50%",display:"flex",flexDirection:"column",gap:"20px"}}>
-            <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Cash in Hand: {remaining_cash_in_hand_balance}</h2>
-            <Table
-                columns={columns}
-                dataSource={[...offlineArray].reverse()}
-                bordered
-                title={() => (
-                <h2 style={{ textAlign: 'center' }}>Cash In Hand Transactions</h2>
-                )}
-                pagination={pagination}
-            />
-        </div>
-    </div>
+        <div className="barrier-hz" style={{backgroundColor:"black",width:"100%",height:"1vh"}}></div>
     </div>
     
   );
