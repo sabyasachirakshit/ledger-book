@@ -12,22 +12,27 @@ app.get('/serverdata', (req, res) => {
     if (err) {
       console.log(err);
     } else {
-      onlineArray = JSON.parse(data);
+      if(!data || data.length === 0){
+        onlineArray=[];
+      }else{
+        onlineArray = JSON.parse(data);
+      }
       fs.readFile("offline_data.json", (err, data) => {
         if (err) {
           console.log(err);
         } else {
-          if(data){
-            offlineArray = JSON.parse(data);
+          if(!data || data.length === 0){
+            offlineArray=[];
           }
           else{
-            offlineArray=[];
+            offlineArray = JSON.parse(data);
           }
           res.json({'offline_array':offlineArray,'online_array':onlineArray});
         }
       });
     }
   });
+  
 });
 
 app.post('/write-online-array', (req, res) => {
@@ -36,7 +41,11 @@ app.post('/write-online-array', (req, res) => {
       if (err) {
           console.log(err);
       } else {
-          let onlineArray = JSON.parse(fileData);        
+          if(!fileData || fileData.length === 0){
+            onlineArray=[];
+          }else{
+            onlineArray = JSON.parse(fileData);
+          }   
           onlineArray.push(data);
           fs.writeFile("online_data.json", JSON.stringify(onlineArray), (err) => {
               if (err) {
@@ -56,12 +65,16 @@ app.post('/write-offline-array', (req, res) => {
       if (err) {
           console.log(err);
       } else {
-          let offlineArray = JSON.parse(fileData);
+          if(!fileData || fileData.length === 0){
+            offlineArray=[];
+          }else{
+            offlineArray = JSON.parse(fileData);
+          }   
           offlineArray.push(data);
           fs.writeFile("offline_data.json", JSON.stringify(offlineArray), (err) => {
               if (err) {
                   console.log(err);
-              } else {
+              } else {                 
                   res.json({ message: 'Offline transaction Data received!' });
               }
           });
