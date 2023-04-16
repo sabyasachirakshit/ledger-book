@@ -19,19 +19,31 @@ const columns = [
     title: 'Debits',
     dataIndex: 'debits',
     key: 'debits',
-    render: text => <span style={{ color: 'red' }}>- {text}</span>,
+    render: text => (
+      <div style={{ color: 'red', textAlign: 'center' }}>
+        {text !== 0 ? `- ${text}` : text}
+      </div>
+    ),
   },
   {
     title: 'Credits',
     dataIndex: 'credits',
     key: 'credits',
-    render: text => <span style={{ color: 'green' }}>+ {text}</span>,
+    render: text => (
+      <div style={{ color: 'green', textAlign: 'center' }}>
+        {text !== 0 ? `+ ${text}` : text}
+      </div>
+    ),
   },
   {
     title: 'Balance',
     dataIndex: 'balance',
     key: 'balance',
-    render: text => <span style={{ color: 'blue' }}>{text}</span>,
+    render: text => (
+      <div style={{ color: 'blue' }}>
+        {text}
+      </div>
+    ),
   },
 ];
 
