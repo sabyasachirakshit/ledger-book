@@ -3,6 +3,8 @@ import { Table,Button } from 'antd';
 import moment from 'moment-timezone';
 import { Modal, Form,DatePicker,TimePicker,Input,InputNumber,Radio } from 'antd';
 
+import { CaretUpFilled, CaretDownFilled } from '@ant-design/icons';
+
 const columns = [
   {
     title: 'Date and Time',
@@ -39,13 +41,16 @@ const columns = [
     title: 'Balance',
     dataIndex: 'balance',
     key: 'balance',
-    render: text => (
-      <div style={{ color: 'blue' }}>
+    render: (text, record) => (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
         {text}
+        {record.debits === 0 && <CaretUpFilled style={{ color: 'green', marginLeft: 8 }} />}
+        {record.credits === 0 && <CaretDownFilled style={{ color: 'red', marginLeft: 8 }} />}
       </div>
     ),
   },
 ];
+
 
   const pagination = {
     pageSize: 20,
@@ -229,7 +234,9 @@ const handleFormSubmit = async(values) => {
 };
   return (
     <div className="ledger-book-screen" style={{display:"flex",flexDirection:"column"}}>
-        <h1 className="total-balance-screen" style={{display:"flex",justifyContent:"center"}}>Total Balance: {remaining_bank_balance+remaining_cash_in_hand_balance}</h1>
+        <h1 className="total-balance-screen" style={{ display: "flex", justifyContent: "center" }}>
+          Total Balance: <div style={{color: remaining_bank_balance + remaining_cash_in_hand_balance < 0 ? "red" : "green"}}>{remaining_bank_balance + remaining_cash_in_hand_balance}</div> 
+        </h1>
         <TransactionForm visible={visible} handleFormSubmit={handleFormSubmit} />
         <div className="transaction-button" style={{marginBottom:"10px",display:"flex",width:"100%",justifyContent:"center"}}>
                 <Button type="primary" onClick={showForm}>Add Transaction</Button>
@@ -237,7 +244,7 @@ const handleFormSubmit = async(values) => {
         <div className="barrier-hz" style={{backgroundColor:"black",width:"100%",height:"1vh"}}></div>
         <div className='ledger-tables-screen' style={{display:"flex",gap:"20px"}}>
           <div className="table-1" style={{marginTop:"1%",width:"50%",display:"flex",flexDirection:"column",gap:"20px"}}>
-              <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Bank Balance: {remaining_bank_balance}</h2>           
+              <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Bank Balance: <div style={{color: remaining_bank_balance < 0 ? "red" : "green"}}>{remaining_bank_balance}</div></h2>           
               <Table
                   columns={columns}
                   dataSource={[...onlineArray].reverse()}
@@ -250,7 +257,7 @@ const handleFormSubmit = async(values) => {
           </div>
           <div className="barrier-vt" style={{backgroundColor:"black",width:"0.5%"}}></div>
           <div className="table-2" style={{marginTop:"1%",width:"50%",display:"flex",flexDirection:"column",gap:"20px"}}>
-              <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Cash in Hand: {remaining_cash_in_hand_balance}</h2>
+              <h2 className='bank-balance' style={{display:"flex",justifyContent:"center"}}>Remaining Cash in Hand: <div style={{color: remaining_cash_in_hand_balance < 0 ? "red" : "green"}}>{remaining_cash_in_hand_balance}</div></h2>
               <Table
                   columns={columns}
                   dataSource={[...offlineArray].reverse()}
