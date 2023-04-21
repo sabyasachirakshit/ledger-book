@@ -111,6 +111,22 @@ const LedgerTable = () => {
                   <Radio value="credit">Credit</Radio>
                 </Radio.Group>
               </Form.Item>
+              <Form.Item name="e_type" label="Expense Type" rules={[{ required: true }]}>
+                <Radio.Group>
+                  <Radio value="food">Food</Radio>
+                  <Radio value="transport">Transport</Radio>
+                  <Radio value="travel">Travel</Radio>
+                  <Radio value="education">Education</Radio>
+                  <Radio value="family">Family</Radio>
+                  <Radio value="salary">Salary</Radio>
+                  <Radio value="atm">ATM Withdrawal</Radio>
+                  <Radio value="gift">Gift</Radio>
+                  <Radio value="entertainment">Entertainment</Radio>
+                  <Radio value="friends">Friends</Radio>
+                  <Radio value="loan">Loan</Radio>
+                  <Radio value="others">Others</Radio>
+                </Radio.Group>
+              </Form.Item>
               <Form.Item name="m_type" label="Transaction Mode" rules={[{ required: true }]}>
                 <Radio.Group>
                   <Radio value="online">Online Bank Transaction</Radio>
@@ -142,6 +158,7 @@ const handleFormSubmit = async(values) => {
                 description: values.description,
                 debits: values.amount,
                 credits:0,
+                expense:values.e_type,
                 balance:total_balance-values.amount
               };
               setOnlineKey(onlineKey++);
@@ -166,6 +183,7 @@ const handleFormSubmit = async(values) => {
                 description: values.description,
                 debits: 0,
                 credits:values.amount,
+                expense:values.e_type,
                 balance:total_balance+values.amount
               };
               onlineKey++;
@@ -192,6 +210,7 @@ const handleFormSubmit = async(values) => {
                 description: values.description,
                 debits: values.amount,
                 credits:0,
+                expense:values.e_type,
                 balance:total_balance-values.amount
               };
               setOfflineKey(offlineKey++);
@@ -215,6 +234,7 @@ const handleFormSubmit = async(values) => {
                 description: values.description,
                 debits: 0,
                 credits:values.amount,
+                expense:values.e_type,
                 balance:total_balance+values.amount
               };
               offlineKey++;

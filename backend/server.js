@@ -82,6 +82,27 @@ app.post('/write-offline-array', (req, res) => {
   });
 });
 
+app.get('/expense', (req, res) => {
+  fs.readFile("online_data.json", (err, data) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({ error: 'Error reading data file' });
+    } else {
+      const onlineData = JSON.parse(data);
+      const expenseCounts = {};
+      for (const item of onlineData) {
+        if (item.expense in expenseCounts) {
+          expenseCounts[item.expense]++;
+        } else {
+          expenseCounts[item.expense] = 1;
+        }
+      }
+      res.json(expenseCounts);
+    }
+  });
+});
+
+
 app.listen(4000, () => {
   console.log('App listening on port 4000!');
 });
