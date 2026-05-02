@@ -8,7 +8,7 @@ app.use(cors());
 app.get('/serverdata', (req, res) => {
   let onlineArray = [];
   let offlineArray = [];
-  fs.readFile("online_data.json", (err, data) => {
+  fs.readFile("backend/online_data.json", (err, data) => {
     if (err) {
       console.log(err);
     } else {
@@ -17,7 +17,7 @@ app.get('/serverdata', (req, res) => {
       }else{
         onlineArray = JSON.parse(data);
       }
-      fs.readFile("offline_data.json", (err, data) => {
+      fs.readFile("backend/offline_data.json", (err, data) => {
         if (err) {
           console.log(err);
         } else {
@@ -37,7 +37,7 @@ app.get('/serverdata', (req, res) => {
 
 app.post('/write-online-array', (req, res) => {
   const data = req.body;
-  fs.readFile("online_data.json", (err, fileData) => {
+  fs.readFile("backend/online_data.json", (err, fileData) => {
       if (err) {
           console.log(err);
       } else {
@@ -47,7 +47,7 @@ app.post('/write-online-array', (req, res) => {
             onlineArray = JSON.parse(fileData);
           }   
           onlineArray.push(data);
-          fs.writeFile("online_data.json", JSON.stringify(onlineArray), (err) => {
+          fs.writeFile("backend/online_data.json", JSON.stringify(onlineArray), (err) => {
               if (err) {
                   console.log(err);
               } else {                 
@@ -61,7 +61,7 @@ app.post('/write-online-array', (req, res) => {
 
 app.post('/write-offline-array', (req, res) => {
   const data = req.body;
-  fs.readFile("offline_data.json", (err, fileData) => {
+  fs.readFile("backend/offline_data.json", (err, fileData) => {
       if (err) {
           console.log(err);
       } else {
@@ -71,7 +71,7 @@ app.post('/write-offline-array', (req, res) => {
             offlineArray = JSON.parse(fileData);
           }   
           offlineArray.push(data);
-          fs.writeFile("offline_data.json", JSON.stringify(offlineArray), (err) => {
+          fs.writeFile("backend/offline_data.json", JSON.stringify(offlineArray), (err) => {
               if (err) {
                   console.log(err);
               } else {                 
